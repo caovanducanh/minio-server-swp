@@ -1,0 +1,9 @@
+# Environment variables - chứa credentials, không đẩy lên git
+.env
+
+# MinIO data volume (nếu mount local thay vì docker volume)
+data/
+
+# OS
+.DS_Store
+Thumbs.db
