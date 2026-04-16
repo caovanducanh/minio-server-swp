@@ -6,6 +6,7 @@ export API_PORT="${MINIO_API_PORT:-9000}"
 export CONSOLE_PORT="${MINIO_CONSOLE_PORT:-9001}"
 export PUBLIC_PORT="${PORT}"
 PUBLIC_URL="${PUBLIC_BASE_URL:-http://localhost:${PUBLIC_PORT}}"
+PUBLIC_BUCKETS="${MINIO_PUBLIC_BUCKETS:-products}"
 
 RAW_SERVER_URL="${MINIO_SERVER_URL:-}"
 case "${RAW_SERVER_URL}" in
@@ -53,6 +54,24 @@ if [ "${ELAPSED_SECONDS}" -ge "${WAIT_TIMEOUT_SECONDS}" ]; then
     echo "Timed out waiting for MinIO readiness on :${API_PORT}"
     exit 1
 fi
+
+mc alias set local "http://127.0.0.1:${API_PORT}" "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}" >/dev/null
+
+for bucket in $(echo "${PUBLIC_BUCKETS}" | tr ',' ' '); do
+    if [ -z "${bucket}" ]; then
+        continue
+    fi
+
+    if ! mc mb --ignore-existing "local/${bucket}" >/dev/null 2>&1; then
+        echo "Failed to ensure bucket exists: ${bucket}"
+        exit 1
+    fi
+
+    if ! mc anonymous set download "local/${bucket}" >/dev/null 2>&1; then
+        echo "Failed to set anonymous download policy for bucket: ${bucket}"
+        exit 1
+    fi
+done
 
 # Render nginx config from template with runtime PORT.
 envsubst '${PORT} ${API_PORT} ${CONSOLE_PORT}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf

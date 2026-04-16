@@ -16,6 +16,7 @@ This project uses Nginx as a reverse proxy so Render can expose MinIO API and Co
    - `MINIO_ROOT_PASSWORD` = your strong password
    - `MINIO_SERVER_URL` = `https://<your-render-domain>`
    - `MINIO_BROWSER_REDIRECT_URL` = `https://<your-render-domain>/console`
+   - `MINIO_PUBLIC_BUCKETS` = comma-separated buckets to auto-set public read on boot (default: `products`)
 4. Add a persistent disk and mount it to `/data`.
 5. Deploy.
 
@@ -24,6 +25,12 @@ This project uses Nginx as a reverse proxy so Render can expose MinIO API and Co
 - Health check: `GET /minio/health/live`
 - Console: `GET /console`
 - S3 API: root path `/`
+
+## Auto public-read policy on boot
+
+- On startup, container uses `mc` to ensure each bucket in `MINIO_PUBLIC_BUCKETS` exists.
+- Then it applies `anonymous download` policy to those buckets.
+- Default behavior already sets `products` bucket to public read.
 
 ## Local docker compose
 
