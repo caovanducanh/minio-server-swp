@@ -11,10 +11,13 @@ export MINIO_BROWSER_REDIRECT_URL="${MINIO_BROWSER_REDIRECT_URL:-${PUBLIC_URL}/c
 minio server /data --address ":${API_PORT}" --console-address ":${CONSOLE_PORT}" &
 MINIO_PID=$!
 
+# Render nginx config from template with runtime PORT.
+envsubst '${PORT}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf
+
 cleanup() {
     kill "${MINIO_PID}" 2>/dev/null || true
 }
 
 trap cleanup INT TERM EXIT
 
-exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+exec nginx -g 'daemon off;'

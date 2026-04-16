@@ -2,7 +2,7 @@
 
 ## Render one-domain setup
 
-This project uses Caddy as a reverse proxy so Render can expose MinIO API and Console on one domain (one public port).
+This project uses Nginx as a reverse proxy so Render can expose MinIO API and Console on one domain (one public port).
 
 - `https://<your-render-domain>/` -> MinIO S3 API
 - `https://<your-render-domain>/console` -> MinIO Console
