@@ -55,7 +55,7 @@ if [ "${ELAPSED_SECONDS}" -ge "${WAIT_TIMEOUT_SECONDS}" ]; then
 fi
 
 # Render nginx config from template with runtime PORT.
-envsubst '${PORT}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf
+envsubst '${PORT} ${API_PORT} ${CONSOLE_PORT}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf
 
 cleanup() {
     kill "${MINIO_PID}" 2>/dev/null || true
