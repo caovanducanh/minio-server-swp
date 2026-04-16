@@ -1,4 +1,13 @@
-FROM quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+FROM quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z AS minio
 
-# Render provides PORT at runtime. MinIO must listen on that port.
-CMD ["sh", "-c", "minio server /data --address :${PORT:-9000}"]
+FROM caddy:2.10-alpine
+
+COPY --from=minio /usr/bin/minio /usr/bin/minio
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY start.sh /usr/local/bin/start.sh
+
+RUN chmod +x /usr/local/bin/start.sh
+
+VOLUME ["/data"]
+
+ENTRYPOINT ["/usr/local/bin/start.sh"]

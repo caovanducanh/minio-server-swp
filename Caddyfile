@@ -1,0 +1,15 @@
+{
+	auto_https off
+}
+
+:{$PORT}
+
+@console path /console /console/*
+handle @console {
+	uri strip_prefix /console
+	reverse_proxy 127.0.0.1:9001
+}
+
+handle {
+	reverse_proxy 127.0.0.1:9000
+}
